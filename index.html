@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ShopNow — E-Commerce Management</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#2d6a4f;--primary-light:#d8f3dc;--primary-dark:#1b4332;
+  --accent:#d4a373;--accent-light:#fefae0;
+  --green:#40916c;--green-light:#d8f3dc;
+  --red:#ae2012;--red-light:#fde8e8;
+  --yellow:#bc6c25;--yellow-light:#fefae0;
+  --cyan:#168aad;--cyan-light:#d9f0f7;
+  --grape:#7b2cbf;--grape-light:#f3e8ff;
+  --bg:#f5f1eb;--white:#fff;--border:#e4ddd4;
+  --text:#1a1a1a;--text2:#4a4540;--text3:#8a8279;
+  --sidebar-bg:#1a1a1a;--sidebar-text:#c8c2b8;--sidebar-active:var(--accent);
+  --card-shadow:0 1px 3px rgba(26,26,26,.05), 0 1px 2px rgba(26,26,26,.03);
+  --hover-shadow:0 4px 16px rgba(26,26,26,.08);
+  --radius:10px;
+  --transition-fast:.18s cubic-bezier(.4,0,.2,1);
+  --transition-med:.3s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);font-size:13.5px;line-height:1.55;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#c8c2b8;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#8a8279}
+
+/* ═══ SIDEBAR ═══ */
+.app-layout{display:flex;min-height:100vh}
+.sidebar{
+  width:230px;background:var(--sidebar-bg);position:fixed;top:0;left:0;bottom:0;z-index:50;
+  display:flex;flex-direction:column;
+  border-right:none;
+}
+.sidebar-logo{padding:24px 22px 20px;border-bottom:1px solid rgba(255,255,255,.06)}
+.sidebar-logo h1{font-size:18px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.sidebar-logo span{font-size:11px;color:rgba(255,255,255,.35);font-weight:400;display:block;margin-top:2px}
+.sidebar-nav{flex:1;padding:16px 12px;overflow-y:auto}
+.nav-section{margin-bottom:20px}
+.nav-label{font-size:9.5px;font-weight:700;color:rgba(255,255,255,.25);text-transform:uppercase;letter-spacing:.12em;padding:6px 12px 6px;user-select:none}
+.nav-item{
+  display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;
+  font-size:13px;font-weight:500;color:var(--sidebar-text);
+  cursor:pointer;transition:all var(--transition-fast);user-select:none;margin-bottom:2px;
+  position:relative;
+}
+.nav-item:hover{background:rgba(255,255,255,.06);color:#fff}
+.nav-item.active{
+  background:rgba(212,163,115,.12);color:var(--sidebar-active);font-weight:600;
+}
+.nav-item.active::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:20px;background:var(--sidebar-active);border-radius:0 2px 2px 0;
+}
+.nav-item .ni{font-size:15px;width:20px;text-align:center;flex-shrink:0;opacity:.8}
+.nav-item.active .ni{opacity:1}
+
+/* ═══ MAIN AREA ═══ */
+.main-area{margin-left:230px;flex:1;min-width:0}
+.topbar{
+  background:var(--white);border-bottom:1px solid var(--border);padding:0 32px;height:56px;
+  display:flex;align-items:center;gap:16px;position:sticky;top:0;z-index:40;
+  backdrop-filter:blur(8px);background:rgba(255,255,255,.92);
+}
+.topbar-title{font-size:16px;font-weight:700;color:var(--text);letter-spacing:-.3px}
+.topbar-sub{font-size:11.5px;color:var(--text3);margin-left:2px;font-weight:400;padding:3px 8px;background:var(--bg);border-radius:4px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.topbar-search{
+  border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12.5px;
+  font-family:'DM Sans',sans-serif;outline:none;width:220px;color:var(--text);
+  transition:all var(--transition-fast);background:var(--bg);
+}
+.topbar-search:focus{border-color:var(--primary);background:var(--white);box-shadow:0 0 0 3px var(--primary-light)}
+.topbar-search::placeholder{color:var(--text3)}
+
+#content{padding:28px 32px;max-width:1200px}
+
+/* ═══ STAT CARDS ═══ */
+.stats-row{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);
+  padding:20px;display:flex;align-items:center;gap:16px;
+  transition:all var(--transition-fast);border:1px solid transparent;cursor:default;
+}
+.stat-card:hover{box-shadow:var(--hover-shadow);transform:translateY(-1px);border-color:var(--border)}
+.stat-dot{width:44px;height:44px;border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.stat-val{font-size:26px;font-weight:700;line-height:1;letter-spacing:-.5px;color:var(--text)}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:4px;font-weight:500;letter-spacing:.02em}
+
+/* ═══ CARD ═══ */
+.card{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);
+  overflow:hidden;margin-bottom:18px;border:1px solid rgba(228,221,212,.5);
+  transition:box-shadow var(--transition-fast);
+}
+.card:hover{box-shadow:var(--hover-shadow)}
+.card-head{
+  padding:16px 22px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.card-title{font-size:14px;font-weight:700;color:var(--text);letter-spacing:-.2px}
+.card-badge{font-size:10.5px;background:var(--primary-light);color:var(--primary);padding:4px 10px;border-radius:6px;font-weight:600}
+
+/* ═══ TABLE ═══ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead{background:#faf8f5}
+th{
+  padding:11px 18px;text-align:left;font-size:10.5px;font-weight:700;color:var(--text3);
+  text-transform:uppercase;letter-spacing:.06em;border-bottom:1.5px solid var(--border);white-space:nowrap;
+}
+td{padding:13px 18px;font-size:13px;border-bottom:1px solid #f0ece6;color:var(--text);vertical-align:middle}
+tbody tr{transition:background var(--transition-fast)}
+tbody tr:hover td{background:#faf8f5}
+tbody tr:last-child td{border-bottom:none}
+.td-right{text-align:right;font-variant-numeric:tabular-nums}
+.mono{font-size:12px;color:var(--text3);font-variant-numeric:tabular-nums}
+
+/* ═══ PILLS ═══ */
+.pill{
+  display:inline-flex;align-items:center;padding:4px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;white-space:nowrap;letter-spacing:.01em;
+}
+.pill-blue{background:var(--primary-light);color:var(--primary)}
+.pill-green{background:var(--green-light);color:var(--green)}
+.pill-orange{background:var(--accent-light);color:var(--yellow)}
+.pill-red{background:var(--red-light);color:var(--red)}
+.pill-gray{background:#f0ece6;color:var(--text2)}
+.pill-yellow{background:var(--yellow-light);color:var(--yellow)}
+.pill-cyan{background:var(--cyan-light);color:var(--cyan)}
+.pill-grape{background:var(--grape-light);color:var(--grape)}
+.id-chip{
+  font-size:11px;color:var(--text3);background:#f0ece6;
+  padding:3px 8px;border-radius:5px;font-weight:600;font-variant-numeric:tabular-nums;
+}
+
+/* ═══ BUTTONS ═══ */
+.btn{
+  border:none;border-radius:8px;padding:9px 18px;font-size:12.5px;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;display:inline-flex;align-items:center;gap:6px;
+  transition:all var(--transition-fast);letter-spacing:.01em;
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{background:var(--primary-dark);box-shadow:0 2px 8px rgba(45,106,79,.25)}
+.btn-accent{background:var(--accent);color:#fff}.btn-accent:hover{background:#c49162}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{background:var(--primary);box-shadow:0 2px 8px rgba(64,145,108,.25)}
+.btn-outline{background:none;border:1.5px solid var(--border);color:var(--text2)}.btn-outline:hover{background:var(--bg);border-color:var(--text3)}
+.btn-sm{padding:6px 12px;font-size:11.5px;border-radius:6px}
+.btn-cart{
+  background:var(--primary);color:#fff;border:none;border-radius:7px;padding:7px 14px;
+  font-size:11.5px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;
+  transition:all var(--transition-fast);
+}
+.btn-cart:hover{background:var(--primary-dark);box-shadow:0 2px 8px rgba(45,106,79,.2)}
+.btn-cart:active{transform:scale(.96)}
+
+/* Action links in tables */
+.act-link{
+  font-size:12px;font-weight:600;cursor:pointer;background:none;border:none;
+  font-family:'DM Sans',sans-serif;padding:4px 8px;border-radius:6px;transition:all var(--transition-fast);
+}
+.act-edit{color:var(--primary)}.act-edit:hover{background:var(--primary-light)}
+.act-del{color:var(--red)}.act-del:hover{background:var(--red-light)}
+.act-sep{color:var(--border);font-size:10px;margin:0 1px}
+
+/* ═══ FILTER BAR ═══ */
+.filter-bar{padding:12px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:#faf8f5}
+.filter-input{
+  border:1.5px solid var(--border);border-radius:7px;padding:8px 13px;font-size:12.5px;
+  font-family:'DM Sans',sans-serif;color:var(--text);outline:none;background:var(--white);
+  width:220px;transition:all var(--transition-fast);
+}
+.filter-input:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.filter-input::placeholder{color:var(--text3)}
+.filter-select{
+  border:1.5px solid var(--border);border-radius:7px;padding:8px 13px;font-size:12.5px;
+  font-family:'DM Sans',sans-serif;color:var(--text);outline:none;background:var(--white);min-width:180px;
+  cursor:pointer;transition:border var(--transition-fast);
+}
+.filter-select:focus{border-color:var(--primary)}
+
+/* ═══ CART LAYOUT ═══ */
+.cart-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+.cart-summary{
+  background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);
+  overflow:hidden;position:sticky;top:72px;border:1px solid rgba(228,221,212,.5);
+}
+.cart-summary-head{padding:16px 20px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px;letter-spacing:-.2px}
+.cart-summary-body{padding:14px 20px}
+.cart-item-mini{display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid #f0ece6;font-size:12.5px}
+.cart-item-mini:last-child{border:none}
+.qty-ctrl{display:inline-flex;align-items:center;border:1.5px solid var(--border);border-radius:7px;overflow:hidden}
+.qty-btn{
+  width:28px;height:30px;border:none;background:#faf8f5;cursor:pointer;
+  font-size:14px;font-weight:600;color:var(--text2);transition:all var(--transition-fast);
+  display:flex;align-items:center;justify-content:center;
+}
+.qty-btn:hover{background:#f0ece6;color:var(--text)}
+.qty-val{
+  width:34px;text-align:center;font-size:12px;font-weight:700;border:none;
+  border-left:1.5px solid var(--border);border-right:1.5px solid var(--border);
+  background:var(--white);height:30px;line-height:30px;color:var(--text);
+}
+.cart-footer{padding:16px 20px;border-top:1px solid var(--border);background:#faf8f5}
+.cart-total-line{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;color:var(--text2)}
+.cart-total-line.final{font-weight:700;font-size:17px;padding:10px 0 4px;border-top:1.5px solid var(--border);margin-top:6px;color:var(--text)}
+
+/* ═══ DELIVERY PROGRESS BAR ═══ */
+.progress-track{display:flex;align-items:center;gap:0;width:200px}
+.progress-seg{flex:1;height:5px;background:#e4ddd4;transition:background var(--transition-med);border-radius:0}
+.progress-seg:first-child{border-radius:3px 0 0 3px}
+.progress-seg:last-child{border-radius:0 3px 3px 0}
+.progress-seg.filled{background:var(--green)}
+.progress-seg.current{background:var(--accent)}
+.status-select{
+  border:1.5px solid var(--border);border-radius:7px;padding:6px 10px;font-size:11.5px;
+  font-family:'DM Sans',sans-serif;background:var(--white);cursor:pointer;
+  transition:border var(--transition-fast);
+}
+.status-select:focus{border-color:var(--primary)}
+.status-label{font-size:10.5px;color:var(--text3);margin-top:4px;font-weight:500}
+
+/* ═══ PURCHASE HISTORY ═══ */
+.history-card{background:var(--white);border-radius:var(--radius);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:14px}
+.history-head{padding:14px 20px;border-bottom:1px solid #f0ece6;display:flex;align-items:center;justify-content:space-between}
+.history-items{padding:10px 20px}
+.history-item{display:flex;align-items:center;padding:8px 0;border-bottom:1px solid #faf8f5;font-size:13px;gap:12px}
+.history-item:last-child{border:none}
+.history-footer{padding:10px 20px;text-align:right;font-weight:700;font-size:14px;background:#faf8f5;border-top:1px solid #f0ece6}
+
+/* ═══ MODAL ═══ */
+.overlay{
+  position:fixed;inset:0;background:rgba(26,26,26,.4);backdrop-filter:blur(3px);
+  z-index:200;display:flex;align-items:center;justify-content:center;
+  animation:fadeIn .2s ease;
+}
+.modal{
+  background:var(--white);border-radius:14px;width:440px;max-width:95vw;
+  box-shadow:0 20px 60px rgba(26,26,26,.12), 0 4px 20px rgba(26,26,26,.06);
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden;
+}
+.modal-header{padding:22px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.modal-title{font-size:17px;font-weight:700;letter-spacing:-.3px}
+.modal-close{
+  background:none;border:none;cursor:pointer;font-size:16px;color:var(--text3);
+  padding:4px 8px;border-radius:6px;transition:all var(--transition-fast);
+  width:32px;height:32px;display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{background:#f0ece6;color:var(--text)}
+.modal-body{padding:22px 24px}
+.form-row{margin-bottom:18px}
+.form-row label{display:block;font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.06em}
+.form-row input,.form-row select{
+  width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;font-family:'DM Sans',sans-serif;color:var(--text);outline:none;
+  background:var(--white);transition:all var(--transition-fast);
+}
+.form-row input:focus,.form-row select:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--primary-light)}
+.form-row input::placeholder{color:var(--text3)}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;background:#faf8f5}
+
+/* ═══ EMPTY STATE ═══ */
+.empty-state{text-align:center;padding:50px 20px;color:var(--text3)}
+.empty-icon{font-size:34px;margin-bottom:8px;opacity:.4}
+.empty-text{font-size:13px}
+
+/* ═══ SECTION HEADER ═══ */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.section-title{font-size:22px;font-weight:700;color:var(--text);letter-spacing:-.4px}
+.section-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.picker-row{display:flex;align-items:center;gap:10px;margin-bottom:18px}
+.picker-label{font-size:12px;font-weight:600;color:var(--text2)}
+
+/* ═══ ANIMATIONS ═══ */
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes popIn{from{opacity:0;transform:scale(.94) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes countPulse{0%{transform:scale(1)}50%{transform:scale(1.04)}100%{transform:scale(1)}}
+.page-section{animation:slideIn .35s cubic-bezier(.4,0,.2,1) both}
+.hidden{display:none!important}
+
+/* ═══ Sub items ═══ */
+.sub-item-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid #f0ece6;font-size:12.5px}
+.sub-item-row:last-child{border:none}
+
+/* ═══ TOAST NOTIFICATION ═══ */
+.toast{
+  position:fixed;bottom:28px;right:28px;z-index:300;
+  background:var(--sidebar-bg);color:#fff;padding:14px 22px;border-radius:10px;
+  font-size:13px;font-weight:500;box-shadow:0 8px 30px rgba(0,0,0,.15);
+  transform:translateY(20px);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;max-width:340px;
+}
+.toast.show{transform:translateY(0);opacity:1;pointer-events:auto}
+
+/* ═══ RESPONSIVE ═══ */
+@media(max-width:900px){
+  .sidebar{width:64px}
+  .sidebar-logo span,.nav-label,.nav-item span:not(.ni){display:none}
+  .nav-item{justify-content:center;padding:10px}
+  .nav-item.active::before{display:none}
+  .main-area{margin-left:64px}
+  .cart-layout{grid-template-columns:1fr}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .topbar{padding:0 18px}
+  #content{padding:20px 18px}
+}
+</style>
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <h1>ShopNow</h1>
+      <span>E-Commerce Manager</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-label">Main</div>
+        <div class="nav-item active" onclick="showPage('dashboard')"><span class="ni">⊞</span> <span>Overview</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Store</div>
+        <div class="nav-item" onclick="showPage('customers')"><span class="ni">◎</span> <span>Customers</span></div>
+        <div class="nav-item" onclick="showPage('categories')"><span class="ni">◫</span> <span>Categories</span></div>
+        <div class="nav-item" onclick="showPage('products')"><span class="ni">⊡</span> <span>Products</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Shopping</div>
+        <div class="nav-item" onclick="showPage('cart')"><span class="ni">🛒</span> <span>Cart</span></div>
+        <div class="nav-item" onclick="showPage('orders')"><span class="ni">⊟</span> <span>Orders</span></div>
+        <div class="nav-item" onclick="showPage('orderitems')"><span class="ni">≡</span> <span>Order Items</span></div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-label">Tracking</div>
+        <div class="nav-item" onclick="showPage('history')"><span class="ni">📋</span> <span>Purchase History</span></div>
+        <div class="nav-item" onclick="showPage('delivery')"><span class="ni">🚚</span> <span>Delivery Status</span></div>
+      </div>
+    </nav>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main-area">
+    <div class="topbar">
+      <span class="topbar-title" id="topbar-title">Overview</span>
+      <span class="topbar-sub" id="topbar-sub">Dashboard</span>
+      <div class="topbar-right">
+        <input class="topbar-search" type="text" placeholder="Search…" readonly/>
+      </div>
+    </div>
+
+    <div id="content">
+
+      <!-- DASHBOARD -->
+      <div id="page-dashboard" class="page-section">
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-dot" style="background:var(--primary-light);color:var(--primary)">👥</div><div><div class="stat-val" id="s-customers">—</div><div class="stat-lbl">Customers</div></div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--green-light);color:var(--green)">📦</div><div><div class="stat-val" id="s-products">—</div><div class="stat-lbl">Products</div></div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--accent-light);color:var(--accent)">🛒</div><div><div class="stat-val" id="s-orders">—</div><div class="stat-lbl">Orders</div></div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--yellow-light);color:var(--yellow)">₹</div><div><div class="stat-val" id="s-revenue">—</div><div class="stat-lbl">Revenue</div></div></div>
+          <div class="stat-card"><div class="stat-dot" style="background:var(--grape-light);color:var(--grape)">🛍</div><div><div class="stat-val" id="s-cart">—</div><div class="stat-lbl">In Carts</div></div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><span class="card-title">Recent Orders</span><span class="card-badge">Last 5</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Status</th></tr></thead><tbody id="d-orders-tb"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div id="page-customers" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Customers</div><div class="section-sub" id="c-count"></div></div><button class="btn btn-primary" onclick="openModal('customer')">+ Add Customer</button></div>
+        <div class="card"><div class="card-head"><span class="card-title">All Customers</span></div>
+          <div class="filter-bar"><input class="filter-input" placeholder="Search by name or email…" oninput="filterTable('tb-customers',this.value,[1,2])"/></div>
+          <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Name</th><th>Email</th><th style="text-align:right">Actions</th></tr></thead><tbody id="tb-customers"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CATEGORIES -->
+      <div id="page-categories" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Categories</div><div class="section-sub" id="cat-count"></div></div><button class="btn btn-primary" onclick="openModal('category')">+ Add Category</button></div>
+        <div class="card"><div class="card-head"><span class="card-title">All Categories</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Category Name</th><th style="text-align:right">Actions</th></tr></thead><tbody id="tb-categories"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- PRODUCTS -->
+      <div id="page-products" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Products</div><div class="section-sub" id="p-count"></div></div><button class="btn btn-primary" onclick="openProductModal()">+ Add Product</button></div>
+        <div class="card"><div class="card-head"><span class="card-title">All Products</span></div>
+          <div class="filter-bar"><input class="filter-input" placeholder="Search by product name…" oninput="filterTable('tb-products',this.value,[1])"/></div>
+          <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Product</th><th>Category</th><th class="td-right">Price</th><th style="text-align:right">Actions</th></tr></thead><tbody id="tb-products"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CART -->
+      <div id="page-cart" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Shopping Cart</div><div class="section-sub">Add products and checkout for a customer</div></div></div>
+        <div class="picker-row">
+          <span class="picker-label">Buying as:</span>
+          <select id="cart-cust" class="filter-select" onchange="loadCart()"></select>
+        </div>
+        <div class="cart-layout">
+          <div class="card" style="margin:0">
+            <div class="card-head"><span class="card-title">Products Catalog</span></div>
+            <div class="tbl-wrap"><table><thead><tr><th>#</th><th>Product</th><th>Category</th><th class="td-right">Price</th><th style="text-align:center">Action</th></tr></thead><tbody id="tb-cart-products"></tbody></table></div>
+          </div>
+          <div class="cart-summary">
+            <div class="cart-summary-head">🛒 Cart Summary</div>
+            <div class="cart-summary-body" id="cart-items-list"><div style="color:var(--text3);font-size:12px;text-align:center;padding:20px 0">Empty cart</div></div>
+            <div class="cart-footer">
+              <div class="cart-total-line"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
+              <div class="cart-total-line final"><span>Total</span><span id="cart-total" style="color:var(--green)">₹0</span></div>
+              <button class="btn btn-success" style="width:100%;margin-top:12px;justify-content:center;padding:11px" onclick="checkout()" id="btn-do-checkout">Place Order</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ORDERS -->
+      <div id="page-orders" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Orders</div><div class="section-sub" id="o-count"></div></div><button class="btn btn-primary" onclick="openOrderModal()">+ New Order</button></div>
+        <div class="card"><div class="card-head"><span class="card-title">All Orders</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="tb-orders"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- ORDER ITEMS -->
+      <div id="page-orderitems" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Order Items</div><div class="section-sub">Items within each order</div></div><button class="btn btn-primary" onclick="openItemModal()">+ Add Item</button></div>
+        <div class="card"><div class="card-head"><span class="card-title">Orders &amp; Line Items</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Order ID</th><th>Customer</th><th>Date</th><th>Line Items</th><th class="td-right">Total</th></tr></thead><tbody id="tb-orderitems"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- PURCHASE HISTORY -->
+      <div id="page-history" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Purchase History</div><div class="section-sub">View all orders for a customer</div></div></div>
+        <div class="picker-row"><span class="picker-label">Customer:</span><select id="hist-cust" class="filter-select" onchange="loadHistory()"></select></div>
+        <div id="history-list"></div>
+      </div>
+
+      <!-- DELIVERY STATUS -->
+      <div id="page-delivery" class="page-section hidden">
+        <div class="section-header"><div><div class="section-title">Delivery Tracker</div><div class="section-sub">Track and update order delivery</div></div></div>
+        <div class="card"><div class="card-head"><span class="card-title">All Orders — Delivery Pipeline</span></div>
+          <div class="tbl-wrap"><table><thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Progress</th><th>Status</th><th style="text-align:center">Update</th></tr></thead><tbody id="tb-delivery"></tbody></table></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODALS ═══ -->
+<div id="modal-wrap" class="hidden">
+  <div class="overlay" id="ov-customer" onclick="closeAll(event)"><div class="modal" onclick="stop(event)">
+    <div class="modal-header"><span class="modal-title" id="mc-heading">Add Customer</span><button class="modal-close" onclick="closeAll()">✕</button></div>
+    <div class="modal-body"><div class="form-row"><label>Full Name</label><input id="mc-name" placeholder="e.g. Priya Sharma"/></div><div class="form-row"><label>Email</label><input id="mc-email" type="email" placeholder="priya@example.com"/></div></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="saveCustomer()">Save</button></div>
+  </div></div>
+  <div class="overlay" id="ov-category" onclick="closeAll(event)"><div class="modal" onclick="stop(event)">
+    <div class="modal-header"><span class="modal-title" id="mcat-heading">Add Category</span><button class="modal-close" onclick="closeAll()">✕</button></div>
+    <div class="modal-body"><div class="form-row"><label>Category Name</label><input id="mcat-name" placeholder="e.g. Electronics"/></div></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="saveCategory()">Save</button></div>
+  </div></div>
+  <div class="overlay" id="ov-product" onclick="closeAll(event)"><div class="modal" onclick="stop(event)">
+    <div class="modal-header"><span class="modal-title" id="mp-heading">Add Product</span><button class="modal-close" onclick="closeAll()">✕</button></div>
+    <div class="modal-body"><div class="form-row"><label>Product Name</label><input id="mp-name" placeholder="Product name"/></div><div class="form-row"><label>Price (₹)</label><input id="mp-price" type="number" step="0.01" min="0" placeholder="0.00"/></div><div class="form-row"><label>Category</label><select id="mp-cat"></select></div></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="saveProduct()">Save</button></div>
+  </div></div>
+  <div class="overlay" id="ov-order" onclick="closeAll(event)"><div class="modal" onclick="stop(event)">
+    <div class="modal-header"><span class="modal-title">New Order</span><button class="modal-close" onclick="closeAll()">✕</button></div>
+    <div class="modal-body"><div class="form-row"><label>Customer</label><select id="mo-cust"></select></div><div class="form-row"><label>Order Date</label><input id="mo-date" type="date"/></div></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="saveOrder()">Create</button></div>
+  </div></div>
+  <div class="overlay" id="ov-item" onclick="closeAll(event)"><div class="modal" onclick="stop(event)">
+    <div class="modal-header"><span class="modal-title">Add Item to Order</span><button class="modal-close" onclick="closeAll()">✕</button></div>
+    <div class="modal-body"><div class="form-row"><label>Order</label><select id="mi-order"></select></div><div class="form-row"><label>Product</label><select id="mi-prod"></select></div><div class="form-row"><label>Quantity</label><input id="mi-qty" type="number" min="1" value="1"/></div></div>
+    <div class="modal-footer"><button class="btn btn-outline" onclick="closeAll()">Cancel</button><button class="btn btn-primary" onclick="saveItem()">Add</button></div>
+  </div></div>
+</div>
+
+<!-- Toast container -->
+<div class="toast" id="toast-msg"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
